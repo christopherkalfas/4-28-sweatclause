@@ -10,10 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_28_173325) do
+ActiveRecord::Schema.define(version: 2020_04_28_174627) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "challenges", force: :cascade do |t|
+    t.string "name"
+    t.string "activity_name"
+    t.integer "activity_reps"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.bigint "group_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["group_id"], name: "index_challenges_on_group_id"
+  end
 
   create_table "groups", force: :cascade do |t|
     t.string "name"
@@ -27,6 +39,22 @@ ActiveRecord::Schema.define(version: 2020_04_28_173325) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["jti"], name: "index_jwt_blacklists_on_jti"
+  end
+
+  create_table "trackers", force: :cascade do |t|
+    t.integer "sunday_reps", default: 0
+    t.integer "monday_reps", default: 0
+    t.integer "tuesday_reps", default: 0
+    t.integer "wednesday_reps", default: 0
+    t.integer "thursday_reps", default: 0
+    t.integer "friday_reps", default: 0
+    t.integer "saturday_reps", default: 0
+    t.bigint "user_id", null: false
+    t.bigint "challenge_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["challenge_id"], name: "index_trackers_on_challenge_id"
+    t.index ["user_id"], name: "index_trackers_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -43,5 +71,8 @@ ActiveRecord::Schema.define(version: 2020_04_28_173325) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "challenges", "groups"
+  add_foreign_key "trackers", "challenges"
+  add_foreign_key "trackers", "users"
   add_foreign_key "users", "groups"
 end
